@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora de Recuperación de Ingresos Hoteleros</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Calcule cuánto ingreso puede recuperar su hotel a través de la solución de One Journey.">
+  <style>
+    :root {
+      --bg: #f5f5f7;
+      --card-bg: #ffffff;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #111827;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+    }
+    .page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .container {
+      width: 100%;
+      max-width: 520px;
+      background: var(--card-bg);
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+      padding: 22px 20px 20px;
+    }
+    .header {
+      margin-bottom: 16px;
+      text-align: center;
+      position: relative;
+    }
+    .logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    h1 {
+      font-size: 20px;
+      margin: 0 0 4px;
+    }
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin: 0;
+    }
+    .form-section {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      margin-bottom: 4px;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px 10px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      margin-bottom: 10px;
+      outline: none;
+    }
+    input:focus, select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(17,24,39,0.08);
+    }
+    .btn {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 14px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: var(--accent);
+      color: #ffffff;
+      font-weight: 500;
+      margin-top: 4px;
+    }
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .results {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .results h2 {
+      font-size: 15px;
+      margin: 0 0 8px;
+    }
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 6px;
+      column-gap: 8px;
+    }
+    .metric-label {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .metric-value {
+      font-weight: 600;
+      text-align: right;
+    }
+    .cta {
+      margin-top: 14px;
+      text-align: center;
+    }
+    .cta a {
+      display: inline-block;
+      padding: 9px 16px;
+      border-radius: 999px;
+      background: #111827;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    }
+    .cta a:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+    }
+
+    /* Toggle periodo (mensual/anual) */
+    .frequency-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+    .frequency-toggle span {
+      color: var(--text-muted);
+    }
+    .frequency-toggle label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 0;
+      cursor: pointer;
+    }
+    .frequency-toggle input[type="radio"] {
+      margin: 0;
+    }
+
+    /* Fondo verde para la sección de recuperación */
+    .results.recovery {
+      background: rgba(182, 245, 168, 0.75);
+      border-radius: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      margin-top: 20px;
+      margin-left: -12px;
+      margin-right: -12px;
+      padding: 20px 12px 20px 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+    }
+    .results.recovery h2 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <div class="container">
+    <div class="header">
+      <div class="logo">
+        <img
+          src="https://raw.githubusercontent.com/ianschwarz-del/non-rooms-recoup-calculator/refs/heads/main/logo.svg"
+          alt="Logotipo de One Journey"
+          style="height:44px; width:auto;"
+        >
+      </div>
+      <h1>Calculadora de Recuperación de Ingresos Hoteleros</h1>
+      <p class="subtitle">
+        Calcule cuánto ingreso puede recuperar su hotel a través de<br>
+        la solución de One Journey.
+      </p>
+    </div>
+
+    <div class="form-section">
+      <label for="currency">Moneda</label>
+      <select id="currency">
+        <option value="USD" selected>USD ($)</option>
+        <option value="EUR">EUR (€)</option>
+        <option value="GBP">GBP (£)</option>
+        <option value="AED">AED (د.إ)</option>
+        <option value="CAD">CAD ($)</option>
+        <option value="MXN">MXN ($)</option>
+      </select>
+
+      <label for="department">Departamento</label>
+      <select id="department">
+        <option value="Spa" selected>Spa</option>
+        <option value="Alimentos y Bebidas">Alimentos y Bebidas</option>
+        <option value="Banquetes y Catering">Banquetes y Catering</option>
+        <option value="Ingresos Auxiliares de Habitaciones">Ingresos Auxiliares de Habitaciones</option>
+        <option value="Reuniones y Eventos">Reuniones y Eventos</option>
+        <option value="Tiendas y Retail">Tiendas y Retail</option>
+        <option value="Otros">Otros</option>
+      </select>
+
+      <div class="frequency-toggle">
+        <span>Periodo:</span>
+        <label>
+          <input type="radio" name="frequency" value="monthly" checked>
+          Mensual
+        </label>
+        <label>
+          <input type="radio" name="frequency" value="annual">
+          Anual
+        </label>
+      </div>
+
+      <label for="vendorSpend" id="vendorLabel">
+        ¿Cuánto paga en facturas mensuales a proveedores para Spa?
+      </label>
+      <input id="vendorSpend" type="text" placeholder="p. ej. 6.400.000">
+
+      <!-- Paso 1: Impacto estimado -->
+      <div class="results" id="results" style="display:none;">
+        <h2>Impacto estimado</h2>
+
+        <div class="metric">
+          <div class="metric-label" id="impactFeesLabel">
+            Importe de facturas mensuales pagadas para Spa
+          </div>
+          <div class="metric-value" id="feesPaidOut"></div>
+        </div>
+      </div>
+
+      <!-- CTA entre paso 1 y 2 -->
+      <button class="btn" id="calcBtn">¿Cuánto puedo recuperar?</button>
+
+      <!-- Paso 2: Recuperación estimada con One Journey -->
+      <div class="results recovery" id="recovery" style="display:none;">
+        <h2>Recuperación estimada con One Journey</h2>
+
+        <div class="metric">
+          <div class="metric-label" id="recoveryFeesLabel">
+            Ingresos de Spa recuperados
+          </div>
+          <div class="metric-value" id="recoveryFeesOut"></div>
+        </div>
+
+        <div class="cta">
+          <a id="ctaBook" href="https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ0_SfNn_0dmm3jf61l2naJiYS0r4ZzkgiMSl9UMR7t7cWxGMP9GUb0-DlV55cECPrzqR4GkmGvk" target="_blank" rel="noopener noreferrer">
+            Reserva ahora una revisión de 15 minutos
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ---- utilidades de texto dinámico basadas en el departamento y periodo ----
+  function getSelectedDepartmentLabel() {
+    const sel = document.getElementById("department");
+    return sel.options[sel.selectedIndex].text || "Spa";
+  }
+
+  function getFrequency() {
+    const checked = document.querySelector('input[name="frequency"]:checked');
+    return checked ? checked.value : "monthly";
+  }
+
+  function periodWord() {
+    return getFrequency() === "monthly" ? "mensuales" : "anuales";
+  }
+
+  function updateDynamicLabels() {
+    const dept = getSelectedDepartmentLabel();
+    const period = periodWord();
+
+    document.getElementById("vendorLabel").textContent =
+      `¿Cuánto paga en facturas ${period} a proveedores para ${dept}?`;
+
+    document.getElementById("impactFeesLabel").textContent =
+      `Importe de facturas ${period} pagadas para ${dept}`;
+
+    document.getElementById("recoveryFeesLabel").textContent =
+      `Ingresos de ${dept} recuperados`;
+  }
+
+  // ---- parser numérico que soporta formatos ES / US ----
+  function parseLocalizedNumber(value) {
+    if (!value) return 0;
+    let str = value.toString().trim();
+    str = str.replace(/[^\d.,-]/g, "");
+    if (!str) return 0;
+
+    const hasComma = str.indexOf(",") !== -1;
+    const hasDot = str.indexOf(".") !== -1;
+
+    if (hasComma && hasDot) {
+      if (str.lastIndexOf(",") > str.lastIndexOf(".")) {
+        str = str.replace(/\./g, "");
+        let lastComma = str.lastIndexOf(",");
+        str = str.slice(0, lastComma).replace(/,/g, "") + "." + str.slice(lastComma + 1);
+      } else {
+        str = str.replace(/,/g, "");
+      }
+    } else if (hasComma) {
+      const parts = str.split(",");
+      if (parts[1] && parts[1].length > 2) {
+        str = str.replace(/,/g, "");
+      } else {
+        str = str.replace(",", ".");
+      }
+    } else if (hasDot) {
+      const parts = str.split(".");
+      if (parts[1] && parts[1].length > 2) {
+        str = str.replace(/\./g, "");
+      }
+    }
+
+    const num = parseFloat(str);
+    return isNaN(num) ? 0 : num;
+  }
+
+  function formatCurrency(value, currencyCode) {
+    if (isNaN(value)) return "-";
+    return new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: currencyCode || "EUR",
+      maximumFractionDigits: 0
+    }).format(value);
+  }
+
+  function getNumericFromInputById(id) {
+    const el = document.getElementById(id);
+    if (!el) return 0;
+    return parseLocalizedNumber(el.value);
+  }
+
+  function getInputs() {
+    const currency = document.getElementById("currency").value;
+    const invoiceAmount = getNumericFromInputById("vendorSpend");
+    return { currency, invoiceAmount };
+  }
+
+  function renderImpact() {
+    const { currency, invoiceAmount } = getInputs();
+    const resultsEl = document.getElementById("results");
+
+    if (!(invoiceAmount > 0)) {
+      resultsEl.style.display = "none";
+      return;
+    }
+
+    // Impacto = simplemente el importe total de facturas
+    document.getElementById("feesPaidOut").textContent =
+      formatCurrency(invoiceAmount, currency);
+
+    resultsEl.style.display = "block";
+  }
+
+  function renderRecovery() {
+    const { currency, invoiceAmount } = getInputs();
+    const recoveryEl = document.getElementById("recovery");
+    const calcBtn = document.getElementById("calcBtn");
+
+    if (!(invoiceAmount > 0)) {
+      recoveryEl.style.display = "none";
+      return;
+    }
+
+    // Cálculo solicitado: importe de facturas pagadas x 0,0125 (1,25 %)
+    const rebateRate = 0.0125;
+    const feesRecouped = invoiceAmount * rebateRate;
+
+    document.getElementById("recoveryFeesOut").textContent =
+      feesRecouped > 0 ? formatCurrency(feesRecouped, currency) : "-";
+
+    recoveryEl.style.display = "block";
+    calcBtn.style.display = "none";
+  }
+
+  // helpers de formateo
+  function formatVendorInputDisplay() {
+    const currency = document.getElementById("currency").value;
+    const el = document.getElementById("vendorSpend");
+    const numeric = getNumericFromInputById("vendorSpend");
+    if (!numeric) {
+      el.value = "";
+      return;
+    }
+    el.value = new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 0
+    }).format(numeric);
+  }
+
+  function unformatVendorInput() {
+    const el = document.getElementById("vendorSpend");
+    el.value = el.value.replace(/[^\d.,]/g, "");
+  }
+
+  // eventos
+  document.getElementById("vendorSpend").addEventListener("input", renderImpact);
+
+  document.getElementById("currency").addEventListener("change", function () {
+    formatVendorInputDisplay();
+    renderImpact();
+  });
+
+  document.getElementById("department").addEventListener("change", function () {
+    updateDynamicLabels();
+    renderImpact();
+  });
+
+  document.querySelectorAll('input[name="frequency"]').forEach(radio => {
+    radio.addEventListener("change", function () {
+      updateDynamicLabels();
+      renderImpact();
+    });
+  });
+
+  const vendorInput = document.getElementById("vendorSpend");
+  vendorInput.addEventListener("blur", function () {
+    formatVendorInputDisplay();
+    renderImpact();
+  });
+  vendorInput.addEventListener("focus", unformatVendorInput);
+
+  document.getElementById("calcBtn").addEventListener("click", function () {
+    renderImpact();
+    renderRecovery();
+    document.getElementById("recovery").scrollIntoView({ behavior: "smooth" });
+  });
+
+  // inicializar etiquetas dinámicas
+  updateDynamicLabels();
+</script>
+
+</body>
+</html>
