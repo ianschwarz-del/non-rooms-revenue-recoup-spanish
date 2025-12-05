@@ -48,6 +48,42 @@
       align-items: center;
       margin-bottom: 10px;
     }
+
+    /* language switcher */
+    .language-switch {
+      position: absolute;
+      top: 0;
+      right: 0;
+      text-align: right;
+      font-size: 11px;
+    }
+    .language-switch label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .language-switch select {
+      padding: 3px 8px;
+      font-size: 11px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      outline: none;
+      width: auto;
+      min-width: 72px;
+      background-color: rgba(255, 255, 255, 0.9);
+      cursor: pointer;
+    }
+    .language-switch select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(17,24,39,0.08);
+    }
+
     h1 {
       font-size: 20px;
       margin: 0 0 4px;
@@ -180,6 +216,13 @@
       font-size: 16px;
       margin-bottom: 10px;
     }
+
+    @media (max-width: 480px) {
+      .language-switch {
+        top: 4px;
+        right: 4px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -193,25 +236,37 @@
           style="height:44px; width:auto;"
         >
       </div>
-      <h1>Calculadora de Recuperación de Ingresos Hoteleros</h1>
-      <p class="subtitle">
+
+      <div class="language-switch">
+        <label for="language" id="languageLabel">Language</label>
+        <select id="language">
+          <option value="en">🌐 EN</option>
+          <option value="es" selected>🌐 ES</option>
+          <option value="fr">🌐 FR</option>
+          <option value="de">🌐 DE</option>
+          <option value="ar">🌐 AR</option>
+        </select>
+      </div>
+
+      <h1 id="titleText">Calculadora de Recuperación de Ingresos Hoteleros</h1>
+      <p class="subtitle" id="subtitleText">
         Calcule cuánto ingreso puede recuperar su hotel a través de<br>
         la solución de One Journey.
       </p>
     </div>
 
     <div class="form-section">
-      <label for="currency">Moneda</label>
+      <label for="currency" id="currencyLabel">Moneda</label>
       <select id="currency">
-        <option value="USD" selected>USD ($)</option>
-        <option value="EUR">EUR (€)</option>
+        <option value="USD">USD ($)</option>
+        <option value="EUR" selected>EUR (€)</option>
         <option value="GBP">GBP (£)</option>
         <option value="AED">AED (د.إ)</option>
         <option value="CAD">CAD ($)</option>
         <option value="MXN">MXN ($)</option>
       </select>
 
-      <label for="department">Departamento</label>
+      <label for="department" id="departmentLabel">Departamento</label>
       <select id="department">
         <option value="Spa" selected>Spa</option>
         <option value="Alimentos y Bebidas">Alimentos y Bebidas</option>
@@ -223,14 +278,14 @@
       </select>
 
       <div class="frequency-toggle">
-        <span>Periodo:</span>
+        <span id="periodLabel">Periodo:</span>
         <label>
           <input type="radio" name="frequency" value="monthly" checked>
-          Mensual
+          <span id="periodMonthlyText">Mensual</span>
         </label>
         <label>
           <input type="radio" name="frequency" value="annual">
-          Anual
+          <span id="periodAnnualText">Anual</span>
         </label>
       </div>
 
@@ -241,7 +296,7 @@
 
       <!-- Paso 1: Impacto estimado -->
       <div class="results" id="results" style="display:none;">
-        <h2>Impacto estimado</h2>
+        <h2 id="impactHeading">Impacto estimado</h2>
 
         <div class="metric">
           <div class="metric-label" id="impactFeesLabel">
@@ -256,7 +311,7 @@
 
       <!-- Paso 2: Recuperación estimada con One Journey -->
       <div class="results recovery" id="recovery" style="display:none;">
-        <h2>Recuperación estimada con One Journey</h2>
+        <h2 id="recoveryHeading">Recuperación estimada con One Journey</h2>
 
         <div class="metric">
           <div class="metric-label" id="recoveryFeesLabel">
@@ -277,33 +332,161 @@
 </div>
 
 <script>
-  // ---- utilidades de texto dinámico basadas en el departamento y periodo ----
-  function getSelectedDepartmentLabel() {
-    const sel = document.getElementById("department");
-    return sel.options[sel.selectedIndex].text || "Spa";
-  }
+  // ---------- i18n strings ----------
+  const translations = {
+    en: {
+      title: "Hotel Revenue Recoup Calculator",
+      subtitle: "Estimate how much revenue your hotel can earn back through<br>One Journey’s solution.",
+      languageLabel: "Language",
+      currencyLabel: "Currency",
+      departmentLabel: "Department",
+      periodLabel: "Period:",
+      periodMonthly: "Monthly",
+      periodAnnual: "Annual",
+      vendorPlaceholder: "e.g. 6,400,000",
+      impactHeading: "Estimated Impact",
+      calcButton: "How much can I recover?",
+      recoveryHeading: "Estimated Recovery with One Journey",
+      ctaBook: "Book a 15-minute review now",
+      vendorLabelTemplate: "How much do you pay in {period} invoices to vendors for {dept}?",
+      impactFeesLabelTemplate: "Total {period} invoices paid for {dept}",
+      recoveryFeesLabelTemplate: "{dept} revenue recouped"
+    },
+    es: {
+      title: "Calculadora de Recuperación de Ingresos Hoteleros",
+      subtitle: "Calcule cuánto ingreso puede recuperar su hotel a través de<br>la solución de One Journey.",
+      languageLabel: "Idioma",
+      currencyLabel: "Moneda",
+      departmentLabel: "Departamento",
+      periodLabel: "Periodo:",
+      periodMonthly: "Mensual",
+      periodAnnual: "Anual",
+      vendorPlaceholder: "p. ej. 6.400.000",
+      impactHeading: "Impacto estimado",
+      calcButton: "¿Cuánto puedo recuperar?",
+      recoveryHeading: "Recuperación estimada con One Journey",
+      ctaBook: "Reserva ahora una revisión de 15 minutos",
+      vendorLabelTemplate: "¿Cuánto paga en facturas {period} a proveedores para {dept}?",
+      impactFeesLabelTemplate: "Importe de facturas {period} pagadas para {dept}",
+      recoveryFeesLabelTemplate: "Ingresos de {dept} recuperados"
+    },
+    fr: {
+      title: "Calculateur de Recouvrement des Revenus Hôteliers",
+      subtitle: "Estimez le montant de revenus que votre hôtel peut récupérer grâce<br>à la solution One Journey.",
+      languageLabel: "Langue",
+      currencyLabel: "Devise",
+      departmentLabel: "Département",
+      periodLabel: "Période :",
+      periodMonthly: "Mensuelle",
+      periodAnnual: "Annuelle",
+      vendorPlaceholder: "ex. 6 400 000",
+      impactHeading: "Impact estimé",
+      calcButton: "Combien puis-je récupérer ?",
+      recoveryHeading: "Recouvrement estimé avec One Journey",
+      ctaBook: "Planifier un entretien de 15 minutes",
+      vendorLabelTemplate: "Combien payez-vous en factures {period} aux fournisseurs pour {dept} ?",
+      impactFeesLabelTemplate: "Montant des factures {period} payées pour {dept}",
+      recoveryFeesLabelTemplate: "Revenus de {dept} récupérés"
+    },
+    de: {
+      title: "Hotel-Umsatz-Rückgewinnungsrechner",
+      subtitle: "Schätzen Sie, wie viel Umsatz Ihr Hotel über<br>die One-Journey-Lösung zurückgewinnen kann.",
+      languageLabel: "Sprache",
+      currencyLabel: "Währung",
+      departmentLabel: "Abteilung",
+      periodLabel: "Zeitraum:",
+      periodMonthly: "Monatlich",
+      periodAnnual: "Jährlich",
+      vendorPlaceholder: "z. B. 6.400.000",
+      impactHeading: "Geschätzte Auswirkungen",
+      calcButton: "Wie viel kann ich zurückgewinnen?",
+      recoveryHeading: "Geschätzte Rückgewinnung mit One Journey",
+      ctaBook: "Jetzt einen 15-minütigen Termin buchen",
+      vendorLabelTemplate: "Wie viel zahlen Sie in {period}en Rechnungen an Lieferanten für {dept}?",
+      impactFeesLabelTemplate: "Summe der {period}en Rechnungen für {dept}",
+      recoveryFeesLabelTemplate: "Zurückgewonnene Einnahmen für {dept}"
+    },
+    ar: {
+      title: "حاسبة استعادة إيرادات الفندق",
+      subtitle: "احسب مقدار الإيرادات التي يمكن لفندقك استعادتها من خلال<br>حل One Journey.",
+      languageLabel: "اللغة",
+      currencyLabel: "العملة",
+      departmentLabel: "القسم",
+      periodLabel: "الفترة:",
+      periodMonthly: "شهري",
+      periodAnnual: "سنوي",
+      vendorPlaceholder: "مثال: ‎6,400,000‎",
+      impactHeading: "الأثر التقديري",
+      calcButton: "كم يمكنني استعادته؟",
+      recoveryHeading: "الاسترداد التقديري مع One Journey",
+      ctaBook: "احجز الآن مراجعة لمدة 15 دقيقة",
+      vendorLabelTemplate: "كم تدفع في فواتير {period} للموردين لقسم {dept}؟",
+      impactFeesLabelTemplate: "إجمالي الفواتير {period} المدفوعة لقسم {dept}",
+      recoveryFeesLabelTemplate: "إيرادات قسم {dept} المستردة"
+    }
+  };
+
+  let currentLang = "es";
 
   function getFrequency() {
     const checked = document.querySelector('input[name="frequency"]:checked');
     return checked ? checked.value : "monthly";
   }
 
-  function periodWord() {
-    return getFrequency() === "monthly" ? "mensuales" : "anuales";
+  function getSelectedDepartmentLabel() {
+    const sel = document.getElementById("department");
+    return sel.options[sel.selectedIndex].text || "Spa";
+  }
+
+  function getPeriodWord() {
+    const t = translations[currentLang] || translations.es;
+    return getFrequency() === "monthly" ? t.periodMonthly : t.periodAnnual;
   }
 
   function updateDynamicLabels() {
+    const t = translations[currentLang] || translations.es;
     const dept = getSelectedDepartmentLabel();
-    const period = periodWord();
+    const periodWord = getPeriodWord();
+
+    const vendorTemplate = t.vendorLabelTemplate || "";
+    const impactTemplate = t.impactFeesLabelTemplate || "";
+    const recoveryTemplate = t.recoveryFeesLabelTemplate || "";
 
     document.getElementById("vendorLabel").textContent =
-      `¿Cuánto paga en facturas ${period} a proveedores para ${dept}?`;
+      vendorTemplate.replace("{period}", periodWord).replace("{dept}", dept);
 
     document.getElementById("impactFeesLabel").textContent =
-      `Importe de facturas ${period} pagadas para ${dept}`;
+      impactTemplate.replace("{period}", periodWord).replace("{dept}", dept);
 
     document.getElementById("recoveryFeesLabel").textContent =
-      `Ingresos de ${dept} recuperados`;
+      recoveryTemplate.replace("{dept}", dept);
+  }
+
+  function applyLanguage(lang) {
+    const t = translations[lang] || translations.es;
+    currentLang = lang;
+
+    document.documentElement.lang = lang;
+    document.documentElement.dir = (lang === "ar") ? "rtl" : "ltr";
+
+    document.getElementById("titleText").innerHTML = t.title;
+    document.getElementById("subtitleText").innerHTML = t.subtitle;
+
+    document.getElementById("languageLabel").textContent = t.languageLabel;
+    document.getElementById("currencyLabel").textContent = t.currencyLabel;
+    document.getElementById("departmentLabel").textContent = t.departmentLabel;
+    document.getElementById("periodLabel").textContent = t.periodLabel;
+
+    document.getElementById("periodMonthlyText").textContent = t.periodMonthly;
+    document.getElementById("periodAnnualText").textContent = t.periodAnnual;
+
+    document.getElementById("vendorSpend").placeholder = t.vendorPlaceholder;
+    document.getElementById("impactHeading").textContent = t.impactHeading;
+    document.getElementById("calcBtn").textContent = t.calcButton;
+    document.getElementById("recoveryHeading").textContent = t.recoveryHeading;
+    document.getElementById("ctaBook").textContent = t.ctaBook;
+
+    updateDynamicLabels();
   }
 
   // ---- parser numérico que soporta formatos ES / US ----
@@ -372,7 +555,6 @@
       return;
     }
 
-    // Impacto = simplemente el importe total de facturas
     document.getElementById("feesPaidOut").textContent =
       formatCurrency(invoiceAmount, currency);
 
@@ -389,8 +571,7 @@
       return;
     }
 
-    // Cálculo solicitado: importe de facturas pagadas x 0,0125 (1,25 %)
-    const rebateRate = 0.0125;
+    const rebateRate = 0.0125; // 1.25 %
     const feesRecouped = invoiceAmount * rebateRate;
 
     document.getElementById("recoveryFeesOut").textContent =
@@ -454,8 +635,13 @@
     document.getElementById("recovery").scrollIntoView({ behavior: "smooth" });
   });
 
-  // inicializar etiquetas dinámicas
-  updateDynamicLabels();
+  // language change handler
+  document.getElementById("language").addEventListener("change", function () {
+    applyLanguage(this.value);
+  });
+
+  // inicializar en español con EUR preseleccionado
+  applyLanguage("es");
 </script>
 
 </body>
