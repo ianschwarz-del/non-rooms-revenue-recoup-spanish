@@ -350,7 +350,17 @@
       ctaBook: "Book a 15-minute review now",
       vendorLabelTemplate: "How much do you pay in {period} invoices to vendors for {dept}?",
       impactFeesLabelTemplate: "Total {period} invoices paid for {dept}",
-      recoveryFeesLabelTemplate: "{dept} revenue recouped"
+      recoveryFeesLabelTemplate: "{dept} revenue recouped",
+      // dropdown labels for department (keys are the option values)
+      departmentOptions: {
+        "Spa": "Spa",
+        "Alimentos y Bebidas": "Food and Beverage",
+        "Banquetes y Catering": "Banquets and Catering",
+        "Ingresos Auxiliares de Habitaciones": "Ancillary Room Revenue",
+        "Reuniones y Eventos": "Meetings and Events",
+        "Tiendas y Retail": "Retail Outlets",
+        "Otros": "Other"
+      }
     },
     es: {
       title: "Calculadora de Recuperación de Ingresos Hoteleros",
@@ -368,7 +378,16 @@
       ctaBook: "Reserva ahora una revisión de 15 minutos",
       vendorLabelTemplate: "¿Cuánto paga en facturas {period} a proveedores para {dept}?",
       impactFeesLabelTemplate: "Importe de facturas {period} pagadas para {dept}",
-      recoveryFeesLabelTemplate: "Ingresos de {dept} recuperados"
+      recoveryFeesLabelTemplate: "Ingresos de {dept} recuperados",
+      departmentOptions: {
+        "Spa": "Spa",
+        "Alimentos y Bebidas": "Alimentos y Bebidas",
+        "Banquetes y Catering": "Banquetes y Catering",
+        "Ingresos Auxiliares de Habitaciones": "Ingresos Auxiliares de Habitaciones",
+        "Reuniones y Eventos": "Reuniones y Eventos",
+        "Tiendas y Retail": "Tiendas y Retail",
+        "Otros": "Otros"
+      }
     },
     fr: {
       title: "Calculateur de Recouvrement des Revenus Hôteliers",
@@ -386,7 +405,16 @@
       ctaBook: "Planifier un entretien de 15 minutes",
       vendorLabelTemplate: "Combien payez-vous en factures {period} aux fournisseurs pour {dept} ?",
       impactFeesLabelTemplate: "Montant des factures {period} payées pour {dept}",
-      recoveryFeesLabelTemplate: "Revenus de {dept} récupérés"
+      recoveryFeesLabelTemplate: "Revenus de {dept} récupérés",
+      departmentOptions: {
+        "Spa": "Spa",
+        "Alimentos y Bebidas": "Restauration",
+        "Banquetes y Catering": "Banquets et Traiteur",
+        "Ingresos Auxiliares de Habitaciones": "Revenus auxiliaires des chambres",
+        "Reuniones y Eventos": "Réunions et Événements",
+        "Tiendas y Retail": "Boutiques et Retail",
+        "Otros": "Autres"
+      }
     },
     de: {
       title: "Hotel-Umsatz-Rückgewinnungsrechner",
@@ -404,7 +432,16 @@
       ctaBook: "Jetzt einen 15-minütigen Termin buchen",
       vendorLabelTemplate: "Wie viel zahlen Sie in {period}en Rechnungen an Lieferanten für {dept}?",
       impactFeesLabelTemplate: "Summe der {period}en Rechnungen für {dept}",
-      recoveryFeesLabelTemplate: "Zurückgewonnene Einnahmen für {dept}"
+      recoveryFeesLabelTemplate: "Zurückgewonnene Einnahmen für {dept}",
+      departmentOptions: {
+        "Spa": "Spa",
+        "Alimentos y Bebidas": "Food & Beverage",
+        "Banquetes y Catering": "Bankette & Catering",
+        "Ingresos Auxiliares de Habitaciones": "Zusätzliche Zimmererträge",
+        "Reuniones y Eventos": "Meetings & Events",
+        "Tiendas y Retail": "Einzelhandel / Retail",
+        "Otros": "Sonstige"
+      }
     },
     ar: {
       title: "حاسبة استعادة إيرادات الفندق",
@@ -422,7 +459,16 @@
       ctaBook: "احجز الآن مراجعة لمدة 15 دقيقة",
       vendorLabelTemplate: "كم تدفع في فواتير {period} للموردين لقسم {dept}؟",
       impactFeesLabelTemplate: "إجمالي الفواتير {period} المدفوعة لقسم {dept}",
-      recoveryFeesLabelTemplate: "إيرادات قسم {dept} المستردة"
+      recoveryFeesLabelTemplate: "إيرادات قسم {dept} المستردة",
+      departmentOptions: {
+        "Spa": "السبا",
+        "Alimentos y Bebidas": "الأطعمة والمشروبات",
+        "Banquetes y Catering": "الولائم والتموين",
+        "Ingresos Auxiliares de Habitaciones": "إيرادات الغرف الإضافية",
+        "Reuniones y Eventos": "الاجتماعات والفعاليات",
+        "Tiendas y Retail": "متاجر البيع بالتجزئة",
+        "Otros": "أخرى"
+      }
     }
   };
 
@@ -441,6 +487,19 @@
   function getPeriodWord() {
     const t = translations[currentLang] || translations.es;
     return getFrequency() === "monthly" ? t.periodMonthly : t.periodAnnual;
+  }
+
+  // NEW: update department dropdown option labels according to selected language
+  function updateDepartmentOptions(lang) {
+    const t = translations[lang] || translations.es;
+    const map = t.departmentOptions || {};
+    const sel = document.getElementById("department");
+    Array.from(sel.options).forEach(opt => {
+      const key = opt.value; // keep value as-is, change visible label
+      if (map[key]) {
+        opt.textContent = map[key];
+      }
+    });
   }
 
   function updateDynamicLabels() {
@@ -486,6 +545,8 @@
     document.getElementById("recoveryHeading").textContent = t.recoveryHeading;
     document.getElementById("ctaBook").textContent = t.ctaBook;
 
+    // update dropdown labels first, then dependent text
+    updateDepartmentOptions(lang);
     updateDynamicLabels();
   }
 
